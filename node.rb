@@ -15,12 +15,9 @@ class Node
     return false unless value
     return true if new_value == value
     dir, dir_name = get_dir_and_name(new_value)
-
-    if dir.present?
-      dir.insert(new_value)
-    else
+    dir.insert(new_value) {
       self.send("#{dir_name}=".to_sym, Node.new(new_value))
-    end
+    }
   end
 
   def include?(checked_value)
@@ -50,8 +47,13 @@ end
 class EmptyNode < Node
   def present?; false; end
   def include?(*); false; end
+
   def initialize(*)
     @left = nil
+  end
+
+  def insert(*)
+    yield
   end
 end
 
