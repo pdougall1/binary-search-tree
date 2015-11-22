@@ -1,16 +1,22 @@
+require 'pry'
+
 class Node
   attr_reader :value
   attr_accessor :left, :right
+  def present?; true; end
 
   def initialize(value = nil)
     @value = value if value
+    @left = EmptyNode.new
+    @right = EmptyNode.new
   end
 
   def insert(new_value)
+    return false unless value
     return true if new_value == value
     dir, dir_name = get_dir_and_name(new_value)
 
-    if dir
+    if dir.present?
       dir.insert(new_value)
     else
       self.send("#{dir_name}=".to_sym, Node.new(new_value))
@@ -18,14 +24,10 @@ class Node
   end
 
   def include?(checked_value)
+    return false unless value
     return true if checked_value == value
     dir, _ = get_dir_and_name(checked_value)
-
-    if dir
-      dir.include?(checked_value)
-    else
-      false
-    end
+    dir.include?(checked_value)
   end
 
   private
@@ -45,6 +47,18 @@ class Node
   end
 end
 
+class EmptyNode < Node
+  def present?; false; end
+  def include?(*); false; end
+  def initialize(*)
+    @left = nil
+  end
+end
+
+
+
+
+
 # TESTS
 def assert_eq(given, expected, description)
   if given == expected
@@ -55,6 +69,7 @@ def assert_eq(given, expected, description)
     puts ""
   end
 end
+
 
 node = Node.new(10)
 node.insert(5)
