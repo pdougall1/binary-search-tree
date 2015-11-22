@@ -1,4 +1,5 @@
 require 'pry'
+require 'benchmark'
 
 class Node
   attr_reader :value
@@ -108,3 +109,63 @@ assert_eq(node.include?(3), true, "the nested left value")
 assert_eq(Node.new("val").value, "val", 'Initial value')
 assert_error(NoMethodError, 'initial nil value') { Node.new(nil) }
 
+# BENCHMARKS
+puts ''
+puts ''
+count = 500
+test_array = []
+5000.times { test_array << (rand count) }
+
+test_tree = Node.new(test_array.first)
+test_array.each {|value| test_tree.insert(value) }
+
+puts "include? #{count} times"
+Benchmark.bm do |benchmark|
+  benchmark.report("array") { (1..count).each { |n| test_array.include? n } }
+  benchmark.report("tree")  { (1..count).each { |n| test_tree.include? n } }
+end
+
+puts ''
+puts ''
+count = 5000
+test_array = []
+5000.times { test_array << (rand count) }
+
+test_tree = Node.new(test_array.first)
+test_array.each {|value| test_tree.insert(value) }
+
+puts "include? #{count} times"
+Benchmark.bm do |benchmark|
+  benchmark.report("array") { (1..count).each { |n| test_array.include? n } }
+  benchmark.report("tree")  { (1..count).each { |n| test_tree.include? n } }
+end
+
+puts ''
+puts ''
+count = 50000
+test_array = []
+5000.times { test_array << (rand count) }
+
+test_tree = Node.new(test_array.first)
+test_array.each {|value| test_tree.insert(value) }
+
+puts "include? #{count} times"
+Benchmark.bm do |benchmark|
+  benchmark.report("array") { (1..count).each { |n| test_array.include? n } }
+  benchmark.report("tree")  { (1..count).each { |n| test_tree.include? n } }
+end
+
+puts ''
+puts ''
+count = 500000
+test_array = []
+5000.times { test_array << (rand count) }
+
+test_tree = Node.new(test_array.first)
+test_array.each {|value| test_tree.insert(value) }
+
+puts "include? #{count} times"
+Benchmark.bm do |benchmark|
+  benchmark.report("array") { (1..count).each { |n| test_array.include? n } }
+  benchmark.report("tree")  { (1..count).each { |n| test_tree.include? n } }
+end
