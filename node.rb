@@ -2,52 +2,46 @@ class Node
   attr_reader :value
   attr_accessor :left, :right
 
-  def initialize(value)
-    @value = value
+  def initialize(value = nil)
+    @value = value if value
   end
 
   def insert(new_value)
     return true if new_value == value
-    return insert_right(new_value) if new_value > value
-    return insert_left(new_value)  if new_value < value
+    dir, dir_name = get_dir_and_name(new_value)
+
+    if dir
+      dir.insert(new_value)
+    else
+      self.send("#{dir_name}=".to_sym, Node.new(new_value))
+    end
   end
 
   def include?(checked_value)
     return true if checked_value == value
-    return include_right?(checked_value) if checked_value > value
-    return include_left?(checked_value)  if checked_value < value
-  end
+    dir, _ = get_dir_and_name(checked_value)
 
-  def insert_left(new_value)
-    if self.left
-      self.left.insert(new_value)
-    else
-      self.left = Node.new(new_value)
-    end
-  end
-
-  def insert_right(new_value)
-    if self.right
-      self.right.insert(new_value)
-    else
-      self.right = Node.new(new_value)
-    end
-  end
-
-  def include_left?(checked_value)
-    if self.left
-      self.left.include?(checked_value)
+    if dir
+      dir.include?(checked_value)
     else
       false
     end
   end
 
-  def include_right?(checked_value)
-    if self.right
-      self.right.include?(checked_value)
-    else
-      false
-    end
+  private
+
+  def get_dir_and_name(given_value)
+    direction_name = direction_map[given_value <=> value]
+    direction = self.send(direction_name)
+    [direction, direction_name]
+  end
+
+  def direction_map
+    {
+      1  => :right,
+      -1 => :left,
+      0  => :already_present
+    }
   end
 end
 
@@ -65,6 +59,8 @@ end
 node = Node.new(10)
 node.insert(5)
 assert_eq(node.left.value, 5, "Left insert")
+node.insert(5)
+assert_eq(node.left.value, 5, "Left insert didn't get messed up")
 node.insert(3)
 assert_eq(node.left.left.value, 3, "Left insert, when left exists")
 
