@@ -3,7 +3,6 @@ require 'pry'
 class Node
   attr_reader :value
   attr_accessor :left, :right
-  def present?; true; end
 
   def initialize(value)
     nil_value_error unless value
@@ -49,18 +48,13 @@ class Node
 end
 
 class EmptyNode < Node
-  def present?; false; end
+  def initialize(*); end
   def include?(*); false; end
   def nil_value_error; false; end
-
-  def initialize(*)
-    @left = nil
-  end
-
-  def insert(*)
-    yield
-  end
+  def insert(*); yield; end
 end
+
+
 
 # TESTS
 def assert_eq(given, expected, description)
