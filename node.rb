@@ -5,14 +5,14 @@ class Node
   attr_accessor :left, :right
   def present?; true; end
 
-  def initialize(value = nil)
-    @value = value if value
+  def initialize(value)
+    nil_value_error unless value
+    @value = value
     @left = EmptyNode.new
     @right = EmptyNode.new
   end
 
   def insert(new_value)
-    return false unless value
     return true if new_value == value
     dir, dir_name = get_dir_and_name(new_value)
     dir.insert(new_value) {
@@ -21,7 +21,6 @@ class Node
   end
 
   def include?(checked_value)
-    return false unless value
     return true if checked_value == value
     dir, _ = get_dir_and_name(checked_value)
     dir.include?(checked_value)
@@ -37,16 +36,22 @@ class Node
 
   def direction_map
     {
-      1  => :right,
-      -1 => :left,
-      0  => :already_present
+      1   => :right,
+      -1  => :left,
+      0   => :already_present,
+      nil => :nil_value_error
     }
+  end
+
+  def nil_value_error
+    raise NoMethodError, 'May not store "nil" as a value'
   end
 end
 
 class EmptyNode < Node
   def present?; false; end
   def include?(*); false; end
+  def nil_value_error; false; end
 
   def initialize(*)
     @left = nil
@@ -56,10 +61,6 @@ class EmptyNode < Node
     yield
   end
 end
-
-
-
-
 
 # TESTS
 def assert_eq(given, expected, description)
@@ -72,12 +73,25 @@ def assert_eq(given, expected, description)
   end
 end
 
+def assert_error(expected_error, description, &block)
+  begin
+    block.call
+  rescue expected_error
+    puts '.'
+  rescue
+    puts description
+    puts block
+    puts ""
+  end
+end
+
 
 node = Node.new(10)
 node.insert(5)
 assert_eq(node.left.value, 5, "Left insert")
 node.insert(5)
 assert_eq(node.left.value, 5, "Left insert didn't get messed up")
+assert_error(NoMethodError, 'insert nil value') { node.insert(nil) }
 node.insert(3)
 assert_eq(node.left.left.value, 3, "Left insert, when left exists")
 
@@ -98,3 +112,5 @@ assert_eq(node.include?(5), true, "the first left value")
 assert_eq(node.include?(3), true, "the nested left value")
 
 assert_eq(Node.new("val").value, "val", 'Initial value')
+assert_error(NoMethodError, 'initial nil value') { Node.new(nil) }
+
